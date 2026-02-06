@@ -179,11 +179,11 @@ class TranscriptionServiceClass {
         lastError = error instanceof Error ? error : new Error(String(error));
         console.error(`Transcription attempt ${attempt} failed:`, lastError.message);
 
-        // Don't retry on validation errors or client errors
+        // Don't retry on validation errors or client errors (4xx)
         if (
           lastError.message.includes('not configured') ||
           lastError.message.includes('not found') ||
-          (lastError.message.includes('API error') && lastError.message.includes('4'))
+          /API error \(4\d{2}\)/.test(lastError.message)
         ) {
           throw lastError;
         }

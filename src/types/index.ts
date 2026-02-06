@@ -8,6 +8,10 @@
  * - Connections: Knowledge graph relationships between memories
  */
 
+export function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
 // Memory - a captured thought/note/conversation
 export interface Memory {
   id: string;

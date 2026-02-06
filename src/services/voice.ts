@@ -5,7 +5,7 @@
  * and high-quality recording settings for optimal transcription accuracy.
  */
 
-import { Audio, AVPlaybackStatus } from 'expo-av';
+import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
 export interface RecordingResult {

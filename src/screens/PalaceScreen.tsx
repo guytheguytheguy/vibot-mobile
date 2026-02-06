@@ -15,13 +15,9 @@ import * as Haptics from 'expo-haptics';
 import { colors, spacing, typography, borderRadius, roomColors } from '../config/theme';
 import { useApp, actions } from '../store';
 import MemoryCard from '../components/MemoryCard';
-import type { Room } from '../types';
+import { type Room, generateId } from '../types';
 
 const { width } = Dimensions.get('window');
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
 
 const ROOM_COLOR_OPTIONS = Object.entries(roomColors).map(([name, color]) => ({
   name,

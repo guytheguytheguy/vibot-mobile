@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
-  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, borderRadius } from '../config/theme';

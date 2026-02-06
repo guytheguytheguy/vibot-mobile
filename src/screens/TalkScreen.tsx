@@ -18,11 +18,7 @@ import { useApp, actions } from '../store';
 import { VoiceService } from '../services/voice';
 import { TranscriptionService } from '../services/transcription';
 import { AIService } from '../services/ai';
-import type { Message, Conversation, Memory } from '../types';
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
+import { type Message, type Conversation, type Memory, generateId } from '../types';
 
 export default function TalkScreen() {
   const { state, dispatch } = useApp();

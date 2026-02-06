@@ -12,7 +12,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { TabParamList } from '../navigation';
 import MemoryCard from '../components/MemoryCard';
 import SurpriseCard from '../components/SurpriseCard';
 import { useApp } from '../store';
@@ -23,7 +24,7 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const { state } = useApp();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<TabParamList>>();
   const [greeting, setGreeting] = useState('');
   const [surprises, setSurprises] = useState<Surprise[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -32,33 +33,33 @@ export default function HomeScreen() {
   const rooms = state.rooms;
   const recentMemories = memories.slice(0, 5);
 
-  useEffect(() => {
-    updateGreeting();
-    loadSurprises();
-  }, [memories.length]);
-
-  const updateGreeting = () => {
+  const updateGreeting = useCallback(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning');
     else if (hour < 18) setGreeting('Good afternoon');
     else setGreeting('Good evening');
-  };
+  }, []);
 
-  const loadSurprises = async () => {
+  const loadSurprises = useCallback(async () => {
     try {
       const newSurprises = await SurpriseEngine.generateSurprises(memories, rooms, 3);
       setSurprises(newSurprises);
     } catch (error) {
       console.error('Failed to load surprises:', error);
     }
-  };
+  }, [memories, rooms]);
+
+  useEffect(() => {
+    updateGreeting();
+    loadSurprises();
+  }, [updateGreeting, loadSurprises]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await loadSurprises();
     setRefreshing(false);
-  }, [memories, rooms]);
+  }, [loadSurprises]);
 
   const handleDismissSurprise = (id: string) => {
     setSurprises((prev) => prev.filter((s) => s.id !== id));
@@ -73,7 +74,7 @@ export default function HomeScreen() {
   };
 
   const handleQuickCapture = () => {
-    (navigation as any).navigate('Talk');
+    navigation.navigate('Talk');
   };
 
   const totalConnections = memories.reduce(
@@ -104,7 +105,7 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={styles.profileButton}
-            onPress={() => (navigation as any).navigate('Settings')}
+            onPress={() => navigation.navigate('Settings')}
           >
             <Ionicons name="person-circle-outline" size={36} color={colors.primary} />
           </TouchableOpacity>
@@ -161,7 +162,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Recent Memories</Text>
-              <TouchableOpacity onPress={() => (navigation as any).navigate('Search')}>
+              <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                 <Text style={styles.seeAll}>See all</Text>
               </TouchableOpacity>
             </View>
@@ -184,7 +185,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Your Palace</Text>
-              <TouchableOpacity onPress={() => (navigation as any).navigate('Palace')}>
+              <TouchableOpacity onPress={() => navigation.navigate('Palace')}>
                 <Text style={styles.seeAll}>View all</Text>
               </TouchableOpacity>
             </View>
@@ -195,7 +196,7 @@ export default function HomeScreen() {
                   style={styles.roomCard}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    (navigation as any).navigate('Palace');
+                    navigation.navigate('Palace');
                   }}
                   activeOpacity={0.7}
                 >

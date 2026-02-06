@@ -22,7 +22,6 @@ export interface AppState {
   rooms: Room[];
   conversations: Conversation[];
   currentConversation: Conversation | null;
-  isRecording: boolean;
   recordingState: RecordingState;
   settings: AppSettings;
   userId: string | null;
@@ -36,7 +35,6 @@ const initialState: AppState = {
   rooms: [],
   conversations: [],
   currentConversation: null,
-  isRecording: false,
   recordingState: {
     isRecording: false,
     duration: 0,
@@ -88,11 +86,20 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_ERROR':
       return { ...state, error: action.payload };
 
-    case 'ADD_MEMORY':
+    case 'ADD_MEMORY': {
+      const newMemory = action.payload;
       return {
         ...state,
-        memories: [action.payload, ...state.memories],
+        memories: [newMemory, ...state.memories],
+        rooms: newMemory.roomId
+          ? state.rooms.map((room) =>
+              room.id === newMemory.roomId
+                ? { ...room, memoryCount: room.memoryCount + 1 }
+                : room
+            )
+          : state.rooms,
       };
+    }
 
     case 'UPDATE_MEMORY':
       return {
@@ -104,11 +111,20 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ),
       };
 
-    case 'DELETE_MEMORY':
+    case 'DELETE_MEMORY': {
+      const deleted = state.memories.find((m) => m.id === action.payload);
       return {
         ...state,
         memories: state.memories.filter((memory) => memory.id !== action.payload),
+        rooms: deleted?.roomId
+          ? state.rooms.map((room) =>
+              room.id === deleted.roomId
+                ? { ...room, memoryCount: Math.max(0, room.memoryCount - 1) }
+                : room
+            )
+          : state.rooms,
       };
+    }
 
     case 'SET_MEMORIES':
       return { ...state, memories: action.payload };
@@ -172,7 +188,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_RECORDING':
       return {
         ...state,
-        isRecording: action.payload,
         recordingState: {
           ...state.recordingState,
           isRecording: action.payload,
