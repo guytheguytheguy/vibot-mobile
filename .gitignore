@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 
 nul
+
+# APK build artifacts
+*.apk
+
+# Android build output
+android/app/build/
